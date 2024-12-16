@@ -4,7 +4,6 @@ pipeline {
     stage('Clone') {
       steps {
         git(url: scm.userRemoteConfigs[0].url, branch: '$BRANCH_NAME', changelog: true, credentialsId: 'KK-github-key', poll: true)
-        sh 'rm src/npoolstore -rf; git submodule update --init --recursive'
       }
     }
 
@@ -31,6 +30,7 @@ pipeline {
 
 
         sh(returnStdout: false, script: '''
+          cd webui
           set +e
           PATH=/usr/local/bin:$PATH:./node_modules/@quasar/app/bin command quasar
           rc=$?
@@ -65,6 +65,7 @@ pipeline {
       }
       steps {
         sh(returnStdout: false, script: '''
+          cd webui
           feature_name=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
           docker build -t $DOCKER_REGISTRY/entropypool/kline-webui:$feature_name .
         '''.stripIndent())
@@ -77,6 +78,7 @@ pipeline {
         expression { BRANCH_NAME == 'master' }
       }
       steps {
+        sh 'cd webui'
         sh 'docker build -t $DOCKER_REGISTRY/entropypool/kline-webui:latest .'
       }
     }
@@ -201,6 +203,7 @@ pipeline {
       }
       steps {
         sh(returnStdout: false, script: '''
+          cd webui
           tag=`git tag -l | sort -V | tail -n1`
           git reset --hard
           git checkout $tag
@@ -317,8 +320,8 @@ pipeline {
       steps {
         sh(returnStdout: false, script: '''
           feature_name=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
-          sed -i "s/kline-webui:latest/kline-webui:$feature_name/g" k8s/01-kline-webui.yaml.yaml
-          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" k8s/01-kline-webui.yaml.yaml
+          sed -i "s/kline-webui:latest/kline-webui:$feature_name/g" webui/k8s/01-kline-webui.yaml.yaml
+          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" webui/k8s/01-kline-webui.yaml.yaml
           kubectl apply -k k8s
         '''.stripIndent())
       }
@@ -332,8 +335,8 @@ pipeline {
       }
       steps {
         sh '''
-          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" k8s/01-kline-webui.yaml.yaml
-          kubectl apply -k k8s
+          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" webui/k8s/01-kline-webui.yaml.yaml
+          kubectl apply -k webui/k8s
         '''
       }
     }
@@ -350,10 +353,9 @@ pipeline {
 
           git reset --hard
           git checkout $tag
-          sed -i "s/kline-webui:latest/kline-webui:$tag/g" k8s/01-kline-webui.yaml.yaml
-          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" k8s/01-kline-webui.yaml.yaml
-
-          kubectl apply -k k8s
+          sed -i "s/kline-webui:latest/kline-webui:$tag/g" webui/k8s/01-kline-webui.yaml.yaml
+          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" webui/k8s/01-kline-webui.yaml.yaml
+          kubectl apply -k webui/k8s
         '''.stripIndent())
       }
     }
@@ -375,9 +377,9 @@ pipeline {
 
           git reset --hard
           git checkout $tag
-          sed -i "s/kline-webui:latest/kline-webui:$tag/g" k8s/01-kline-webui.yaml.yaml
-          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" k8s/01-kline-webui.yaml.yaml
-          kubectl apply -k k8s
+          sed -i "s/kline-webui:latest/kline-webui:$tag/g" webui/k8s/01-kline-webui.yaml.yaml
+          sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" webui/k8s/01-kline-webui.yaml.yaml
+          kubectl apply -k webui/k8s
         '''.stripIndent())
       }
     }
