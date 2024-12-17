@@ -48,6 +48,7 @@ pipeline {
 
     stage('Switch to current cluster') {
       when {
+        expression { EXIST_K8S == 'true' }
         anyOf {
           expression { BUILD_TARGET == 'true' }
           expression { DEPLOY_TARGET == 'true' }
