@@ -12,7 +12,7 @@ pipeline {
         expression { BUILD_TARGET == 'true' }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           revlist=`git rev-list --tags --max-count=1`
           rc=$?
@@ -29,7 +29,7 @@ pipeline {
         '''.stripIndent())
 
 
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           cd webui
           set +e
           PATH=/usr/local/bin:$PATH:./node_modules/@quasar/app/bin command quasar
@@ -54,7 +54,7 @@ pipeline {
         }
       }
       steps {
-        bash 'cd /etc/kubeasz; ./ezctl checkout $TARGET_ENV'
+        sh 'cd /etc/kubeasz; ./ezctl checkout $TARGET_ENV'
       }
     }
 
@@ -64,7 +64,7 @@ pipeline {
         expression { BRANCH_NAME != 'master' }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           cd webui
           feature_name=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
           docker build -t $DOCKER_REGISTRY/entropypool/kline-webui:$feature_name .
@@ -78,8 +78,8 @@ pipeline {
         expression { BRANCH_NAME == 'master' }
       }
       steps {
-        bash 'cd webui'
-        bash 'docker build -t $DOCKER_REGISTRY/entropypool/kline-webui:latest .'
+        sh 'cd webui'
+        sh 'docker build -t $DOCKER_REGISTRY/entropypool/kline-webui:latest .'
       }
     }
 
@@ -88,7 +88,7 @@ pipeline {
         expression { TAG_PATCH == 'true' }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           revlist=`git rev-list --tags --max-count=1`
           rc=$?
@@ -121,7 +121,7 @@ pipeline {
         '''.stripIndent())
 
         withCredentials([gitUsernamePassword(credentialsId: 'KK-github-key', gitToolName: 'git-tool')]) {
-          bash 'git push --tag'
+          sh 'git push --tag'
         }
       }
     }
@@ -131,7 +131,7 @@ pipeline {
         expression { TAG_MINOR == 'true' }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           revlist=`git rev-list --tags --max-count=1`
           rc=$?
@@ -156,7 +156,7 @@ pipeline {
         '''.stripIndent())
 
         withCredentials([gitUsernamePassword(credentialsId: 'KK-github-key', gitToolName: 'git-tool')]) {
-          bash 'git push --tag'
+          sh 'git push --tag'
         }
       }
     }
@@ -166,7 +166,7 @@ pipeline {
         expression { TAG_MAJOR == 'true' }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           revlist=`git rev-list --tags --max-count=1`
           rc=$?
@@ -192,7 +192,7 @@ pipeline {
         '''.stripIndent())
 
         withCredentials([gitUsernamePassword(credentialsId: 'KK-github-key', gitToolName: 'git-tool')]) {
-          bash 'git push --tag'
+          sh 'git push --tag'
         }
       }
     }
@@ -202,7 +202,7 @@ pipeline {
         expression { BUILD_TARGET == 'true' }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           cd webui
           tag=`git tag -l | sort -V | tail -n1`
           git reset --hard
@@ -229,7 +229,7 @@ pipeline {
         expression { BRANCH_NAME != 'master' }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           feature_name=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
           set +e
           docker images | grep kline-webui | grep $feature_name
@@ -251,7 +251,7 @@ pipeline {
         expression { RELEASE_TARGET == 'true' }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           set +e
           docker images | grep kline-webui | grep latest
           rc=$?
@@ -272,7 +272,7 @@ pipeline {
         expression { RELEASE_TARGET == 'true' }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           tag=`git tag -l | sort -V | tail -n1`
 
           set +e
@@ -291,7 +291,7 @@ pipeline {
         expression { RELEASE_TARGET == 'true' }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           tag=`git tag -l | sort -V | tail -n1`
 
           major=`echo $tag | awk -F '.' '{ print $1 }'`
@@ -318,7 +318,7 @@ pipeline {
         expression { BRANCH_NAME != 'master' }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           feature_name=`echo $BRANCH_NAME | awk -F '/' '{ print $2 }'`
           sed -i "s/kline-webui:latest/kline-webui:$feature_name/g" webui/k8s/01-kline-webui.yaml.yaml
           sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" webui/k8s/01-kline-webui.yaml.yaml
@@ -334,7 +334,7 @@ pipeline {
         expression { BRANCH_NAME == 'master' }
       }
       steps {
-        bash '''
+        sh '''
           sed -i "s/uhub.service.ucloud.cn/$DOCKER_REGISTRY/g" webui/k8s/01-kline-webui.yaml.yaml
           kubectl apply -k webui/k8s
         '''
@@ -348,7 +348,7 @@ pipeline {
         expression { BRANCH_NAME == 'master' }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           tag=`git tag -l | sort -V | tail -n1`
 
           git reset --hard
@@ -366,7 +366,7 @@ pipeline {
         expression { TARGET_ENV ==~ /.*production.*/ }
       }
       steps {
-        bash(returnStdout: false, script: '''
+        sh(returnStdout: false, script: '''
           tag=`git tag -l | sort -V | tail -n1`
 
           major=`echo $tag | awk -F '.' '{ print $1 }'`
@@ -394,14 +394,14 @@ pipeline {
 
         // sh 'go2xunit -fail -input gotest.txt -output gotest.xml'
         // junit "gotest.xml"
-        bash 'echo Posting'
+        sh 'echo Posting'
       }
     }
   }
   post('Report') {
     fixed {
       script {
-        bash(script: 'bash $JENKINS_HOME/wechat-templates/send_wxmsg.sh fixed')
+        sh(script: 'bash $JENKINS_HOME/wechat-templates/send_wxmsg.sh fixed')
      }
       script {
         // env.ForEmailPlugin = env.WORKSPACE
@@ -414,7 +414,7 @@ pipeline {
      }
     success {
       script {
-        bash(script: 'bash $JENKINS_HOME/wechat-templates/send_wxmsg.sh successful')
+        sh(script: 'bash $JENKINS_HOME/wechat-templates/send_wxmsg.sh successful')
      }
       script {
         // env.ForEmailPlugin = env.WORKSPACE
@@ -427,7 +427,7 @@ pipeline {
      }
     failure {
       script {
-        bash(script: 'bash $JENKINS_HOME/wechat-templates/send_wxmsg.sh failure')
+        sh(script: 'bash $JENKINS_HOME/wechat-templates/send_wxmsg.sh failure')
      }
       script {
         // env.ForEmailPlugin = env.WORKSPACE
@@ -440,7 +440,7 @@ pipeline {
      }
     aborted {
       script {
-        bash(script: 'bash $JENKINS_HOME/wechat-templates/send_wxmsg.sh aborted')
+        sh(script: 'bash $JENKINS_HOME/wechat-templates/send_wxmsg.sh aborted')
      }
       script {
         // env.ForEmailPlugin = env.WORKSPACE
