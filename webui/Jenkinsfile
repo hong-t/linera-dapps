@@ -79,8 +79,10 @@ pipeline {
         expression { BRANCH_NAME == 'master' }
       }
       steps {
-        sh 'cd webui'
-        sh 'docker build -t $DOCKER_REGISTRY/entropypool/kline-webui:latest .'
+        sh(returnStdout: false, script: '''
+          cd webui
+          docker build -t $DOCKER_REGISTRY/entropypool/kline-webui:latest .
+        '''.stripIndent())
       }
     }
 
