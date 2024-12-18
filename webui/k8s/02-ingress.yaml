@@ -16,10 +16,18 @@ metadata:
 spec:
   tls:
     - hosts:
-        - '*.linerameme.fun'
-      secretName: linerameme-fun-tls
+        - '*.testnet.linerameme.fun'
+        - 'testnet.linerameme.fun'
+      secretName: testnet-linerameme-fun-tls
   rules:
     - host: testnet.linerameme.fun
+      http:
+        paths:
+          - path: /
+            backend:
+              serviceName: kline-webui
+              servicePort: 80
+    - host: www.testnet.linerameme.fun
       http:
         paths:
           - path: /

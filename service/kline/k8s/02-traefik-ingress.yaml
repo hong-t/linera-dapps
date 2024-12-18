@@ -9,21 +9,16 @@ metadata:
     kubernetes.io/ingress.class: "traefik-internet"
     traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
     traefik.ingress.kubernetes.io/router.middlewares:
-      kube-system-oplog@kubernetescrd,
       kube-system-strip-kline-service-prefix@kubernetescrd,
       kube-system-http-redirect-https@kubernetescrd,
-      kube-system-common-headers@kubernetescrd,
-      kube-system-headers-appid-to-body@kubernetescrd,
-      kube-system-headers-userid-to-body@kubernetescrd,
-      kube-system-headers-app-login-token-to-body@kubernetescrd,
-      kube-system-app-rbac-auth@kubernetescrd
+      kube-system-common-headers@kubernetescrd
 
 spec:
   rules:
     - host: api.npool.top
       http: &http_rules
         paths:
-          - path: /kline/v1
+          - path: /api/kline/v1
             backend:
               serviceName: kline-service
               servicePort: 50870
@@ -32,4 +27,8 @@ spec:
     - host: api.lineraswap.fun
       http: *http_rules
     - host: api.linerablob.fun
+      http: *http_rules
+    - host: api.development.npool.top
+      http: *http_rules
+    - host: api.testnet.linerameme.fun
       http: *http_rules
