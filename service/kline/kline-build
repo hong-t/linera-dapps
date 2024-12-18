@@ -1,0 +1,10 @@
+GONAME=go1.22.10.linux-amd64.tar.gz
+while true
+do
+  curl https://go.dev/dl/$GONAME -o /tmp/$GONAME
+  gofile_md5sum=`md5sum /tmp/$GONAME |awk '{ print $1 }'`
+  [ "$gofile_md5sum" == "c322460c675c40141fb23149f8bdbad7" ] && break
+  sleep 10
+done
+
+docker build . --build-arg ALL_PROXY=$all_proxy --build-arg GOTAR=/tmp/$GONAME --build-arg GONAME=$GONAME -t uhub.service.ucloud.cn/entropypool/kline-service:latest
