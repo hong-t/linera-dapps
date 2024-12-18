@@ -12,7 +12,7 @@ COPY $GOTAR /$GONAME
 RUN tar -C /usr -xzf /$GONAME
 
 RUN apt-get update -y
-RUN apt-get install git wget make -y
+RUN apt-get install git wget make curl jq vim -y
 COPY kline-entrypoint.sh /usr/local/bin
 RUN echo "#!/bin/sh" > /usr/local/bin/entrypoint.sh
 RUN echo "all_proxy=$ALL_PROXY /usr/local/bin/kline-entrypoint.sh" >> /usr/local/bin/entrypoint.sh
