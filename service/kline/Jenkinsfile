@@ -19,6 +19,7 @@ pipeline {
       }
       steps {
         sh(returnStdout: false, script: '''
+          cd service/kline
           export all_proxy=$ALL_PROXY
           bash kline-build
         '''.stripIndent())
@@ -151,6 +152,7 @@ pipeline {
         '''.stripIndent())
 
         sh(returnStdout: false, script: '''
+          cd service/kline
           export all_proxy=$ALL_PROXY
           bash kline-build
         '''.stripIndent())
