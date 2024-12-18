@@ -1,6 +1,12 @@
 #!/bin/bash
 
+while true
+do
 git clone https://github.com/hong-t/linera-dapps.git
+[ 0 -eq $? ] && break
+sleep 30
+done
+
 cd linera-dapps/service/kline
 
 export GOROOT=/usr/go/
