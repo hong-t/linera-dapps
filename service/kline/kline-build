@@ -1,11 +1,13 @@
 GONAME=go1.22.10.linux-amd64.tar.gz
+BASECACHE=/tmp
+
 while true
 do
-  [ ! -f $GONAME ] && curl https://go.dev/dl/$GONAME -o $GONAME
-  gofile_md5sum=`md5sum $GONAME |awk '{ print $1 }'`
+  [ ! -f $BASECACHE/$GONAME ] && curl https://go.dev/dl/$GONAME -o $BASECACHE/$GONAME
+  gofile_md5sum=`md5sum $BASECACHE/$GONAME |awk '{ print $1 }'`
   [ "$gofile_md5sum" == "c322460c675c40141fb23149f8bdbad7" ] && break
-  rm $GONAME
+  rm $BASECACHE/$GONAME
   sleep 10
 done
 
-docker build . --build-arg ALL_PROXY=$all_proxy --build-arg GOTAR=$GONAME --build-arg GONAME=$GONAME -t uhub.service.ucloud.cn/entropypool/kline-service:latest
+docker build . --build-arg ALL_PROXY=$all_proxy --build-arg GOTAR=$BASECACHE/$GONAME --build-arg GONAME=$GONAME -t uhub.service.ucloud.cn/entropypool/kline-service:latest
