@@ -23,7 +23,7 @@ spec:
     - host: api.npool.top
       http: &http_rules
         paths:
-          - path: /api/kline/v1
+          - path: /kline/v1
             backend:
               serviceName: kline-service
               servicePort: 50870
