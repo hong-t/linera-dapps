@@ -1,0 +1,3 @@
+resources:
+  - 01-kline-service.viper.yaml
+  - 02-traefik-ingress.yaml

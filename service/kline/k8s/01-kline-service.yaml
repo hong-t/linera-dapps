@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kline-service
+  namespace: kube-system
+  annotations:
+    "sidecar.jaegertracing.io/inject": "true"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kline-service
+  template:
+    metadata:
+      labels:
+        app: kline-service
+    spec:
+      containers:
+        - name: kline-service
+          image: uhub.service.ucloud.cn/entropypool/kline-service:latest
+          imagePullPolicy: Always
+          env:
+            - name: ENV_ENVIRONMENT_TARGET
+              valueFrom:
+                configMapKeyRef:
+                  name: system-environment
+                  key: environment.target
+            - name: ENV_CONSUL_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: system-environment
+                  key: environment.consul_host
+            - name: ENV_CONSUL_PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: system-environment
+                  key: environment.consul_port
+            - name: ENV_CLUSTER_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kline-service
+  namespace: kube-system
+spec:
+  ports:
+    - name: http
+      port: 50870
+      targetPort: 50870
+    - name: grpc
+      port: 50871
+      targetPort: 50871
+  selector:
+    app: kline-service
