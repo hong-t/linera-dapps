@@ -1,7 +1,7 @@
 GONAME=go1.22.10.linux-amd64.tar.gz
 while true
 do
-  [ ! -f /tmp/$GONAME] && curl https://go.dev/dl/$GONAME -o /tmp/$GONAME
+  [ ! -f /tmp/$GONAME ] && curl https://go.dev/dl/$GONAME -o /tmp/$GONAME
   gofile_md5sum=`md5sum /tmp/$GONAME |awk '{ print $1 }'`
   [ "$gofile_md5sum" == "c322460c675c40141fb23149f8bdbad7" ] && break
   rm /tmp/$GONAME
