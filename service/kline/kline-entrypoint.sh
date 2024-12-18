@@ -13,7 +13,13 @@ export GOROOT=/usr/go/
 export PATH=/usr/go/bin:$PATH
 export GOPROXY=https://goproxy.cn,direct
 
-MYSQL_HOST=`curl http://${ENV_CONSUL_HOST}:${ENV_CONSUL_PORT}/v1/agent/health/service/name/mysql.npool.top | jq '.[0] | .Service | .Address'`
+while true
+do
+MYSQL_HOST=`curl http://${ENV_CONSUL_HOST}:${ENV_CONSUL_PORT}/v1/agent/health/service/name/mysql.npool.top | jq '.[0] | .Service | .Address' | awk -F '"' '{ print $2 }'`
+[ "x" != "x$MYSQL_HOST" ] && break
+sleep 30
+done
+
 sed -i "s/localhost/$MYSQL_HOST'/g"  config/config.toml
 sed -i "s/12345679/$MYSQL_PASSWORD'/g"  config/config.toml
 
