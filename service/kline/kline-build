@@ -1,5 +1,6 @@
 GONAME=go1.22.10.linux-amd64.tar.gz
-BASECACHE=/tmp
+BASECACHE=tmp
+mkdir -p $BASECACHE
 
 while true
 do
